@@ -588,10 +588,27 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 @media (min-width:681px) and (max-width:1599px){ .home.dense .next .m>span:not(.chip):not(.dd):not(.tag){display:none} }
 @media (min-width:681px) and (max-width:1099px){ .home.dense .ttrow{gap:3px} .home.dense .ttc .sj{font-size:11.5px;letter-spacing:-.4px;text-overflow:clip} }
 @media (min-width:681px) and (max-width:999px){ .home.dense .hero{grid-template-columns:auto minmax(0,1fr)} .home.dense .ddrow{grid-column:1/-1;justify-content:flex-start} }
+/* 한눈에 보기: 핵심만, 2열 (오늘 | 할 일) */
+.home.dense .home-cols{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.home.dense .home-col{gap:12px}
+@media (min-width:681px){ .home.dense{gap:12px} .home.dense .homebar{margin:-4px 0 -6px} }
+.mealline{font-size:14.5px;line-height:1.6;word-break:keep-all}
+.mealline+.mealline{margin-top:6px}
+.mealline b{display:inline-block;font-size:12.5px;background:var(--sunk);border-radius:6px;padding:0 7px;margin-right:4px}
+.mealline span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+@media (max-width:680px){
+  .home.dense .hero{padding:14px 16px;gap:10px}
+  .home.dense .hero .date{font-size:26px}
+  .home.dense .next{padding:10px 12px}
+  .home.dense .next .lbl{display:none}
+  .home.dense .next .t{font-size:16px;margin:0}
+  .home.dense .next .m{margin-top:6px}
+  .home.dense .ddrow .ddchip:nth-of-type(n+3){display:none}
+}
 /* 한눈에 보기: 열 제목 */
 .colh{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;padding:0 4px;margin-bottom:-4px}
 .colh .ico{width:15px;height:15px}
-@media (max-width:680px){.colh{display:none}.home .notice{order:-2}.home .quote{order:-1}}
+@media (max-width:680px){.colh{display:none}}
 @media (min-width:681px) and (max-width:959px){ .home.dense .home-col.cc .colh{grid-column:1/-1} }
 /* 칸 제목 아이콘: 어디가 뭔지 한눈에 */
 .hi{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--sunk);color:var(--board);margin-right:8px;vertical-align:-7px;flex:none}
@@ -606,7 +623,7 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .homebar .unfold:hover{color:var(--ink)}
 .viewseg{padding:2px;border-radius:9px}
 .viewseg button{padding:4px 11px;font-size:12.5px;border-radius:7px}
-@media (max-width:680px){.viewseg{display:none}.homebar{margin:0}}
+@media (max-width:680px){.homebar{margin:0}}
 /* 넓은 화면은 조금 더 넓게 */
 @media (min-width:1400px){.wrap,.top-in,.demo-in{max-width:1320px}}
 /* 접기 */
@@ -971,7 +988,7 @@ function mealOrderHTML(d){
     <span class="acts"><button data-act="compose" data-type="meal_order" data-date="${d}" data-no="${o.order_no}" data-time="${hhmm(o.eat_time)}">고치기</button>${canDel(o)?`<button data-act="del" data-t="meal_order" data-id="${o.id}">삭제</button>`:""}</span>
     <span class="by">${o.memo?esc(o.memo)+" · ":""}${esc(o.author_nick)}님이 기록</span></div>`;
 }
-function mealPanel(){
+function mealPanel(compact){
   const m=S.meal, d=m.date||today(), isToday=d===today();
   const configured=CONFIG.SCHOOL_NAME||(CONFIG.NEIS_OFFICE_CODE&&CONFIG.NEIS_SCHOOL_CODE);
   let body;
@@ -979,6 +996,7 @@ function mealPanel(){
   else if(m.loading||!m.date) body=`<p class="mealmsg">급식 불러오는 중…</p>`;
   else if(m.err) body=`<p class="mealmsg">${esc(m.err)}</p>`;
   else if(!m.rows.length) body=`<p class="mealmsg">이날은 급식이 없어요.</p>`;
+  else if(compact) body=m.rows.map(r=>`<p class="mealline"><b>${esc(r.type)}</b> ${r.dishes.map(esc).join(" · ")}${r.cal?` <span>${esc(r.cal)}</span>`:""}</p>`).join("");
   else body=`<div class="meals ${m.rows.length===1?"one":""}">${m.rows.map(r=>`<div class="mealbox"><div class="mt"><b>${esc(r.type)}</b>${r.cal?`<span>${esc(r.cal)}</span>`:""}</div><ul class="dishes">${r.dishes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`;
   return `<section class="panel o4">
     <div class="panel-h"><h2>${hicon("bowl")}${isToday?"오늘의 급식":"급식"}</h2>
@@ -1408,16 +1426,24 @@ VIEWS.home = () => {
   };
   const bar=`<div class="homebar"><button class="unfold foldall-btn" data-act="unfoldAll" hidden>접은 칸 모두 펼치기</button>
     <div class="seg viewseg" role="group" aria-label="홈 보기 방식"><button class="${mode==="comfy"?"on":""}" data-act="homeMode" data-v="comfy" aria-pressed="${mode==="comfy"}">넓게 보기</button><button class="${mode==="dense"?"on":""}" data-act="homeMode" data-v="dense" aria-pressed="${mode==="dense"}">한눈에 보기</button></div></div>`;
-  if(mode==="dense") return `
+  if(mode==="dense"){
+    const perf3=`<section class="panel o1">
+      <div class="panel-h"><h2>${hicon("perf")}다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
+      <div class="panel-b list">
+        ${up.slice(0,3).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span><span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<p class="mealmsg">예정된 수행평가가 없어요.</p>`}
+        ${up.length>3?`<button class="more" style="align-self:flex-start;padding:6px 0 0" data-act="nav" data-view="perf">외 ${up.length-3}개 더 보기</button>`:""}
+      </div></section>`;
+    return `
   <div class="home dense">
     ${P.hero}
     ${bar}
+    ${activeNotices().length?noticePanel():""}
     <div class="home-cols">
-      <div class="home-col ca"><div class="colh">${icon("clock")}오늘</div>${ttPanel()}${mealPanel()}${quotePanel()}</div>
-      <div class="home-col cb"><div class="colh">${icon("check")}할 일</div>${P.perf}${hwPanel()}${P.week}</div>
-      <div class="home-col cc"><div class="colh">${icon("lounge")}우리 반 소식</div>${noticePanel()}${P.lounge}${P.notes}</div>
+      <div class="home-col ca"><div class="colh">${icon("clock")}오늘</div>${ttPanel()}${mealPanel(true)}</div>
+      <div class="home-col cb"><div class="colh">${icon("check")}할 일</div>${perf3}${hwPanel()}</div>
     </div>
   </div>`;
+  }
   return `
   <div class="home comfy">
     ${P.hero}

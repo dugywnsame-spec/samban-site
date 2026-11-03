@@ -141,6 +141,24 @@ create policy "photos_update" on public.photos for update to authenticated using
 create policy "photos_delete" on public.photos for delete to authenticated using (author_id = auth.uid() or public.is_admin());
 
 
+-- 7) 숙제
+create table if not exists public.homework (
+  id uuid primary key default gen_random_uuid(),
+  subject text not null, title text not null, due_date date not null, memo text,
+  author_id uuid not null default auth.uid() references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.homework enable row level security;
+drop policy if exists "homework_read" on public.homework;
+drop policy if exists "homework_insert" on public.homework;
+drop policy if exists "homework_update" on public.homework;
+drop policy if exists "homework_delete" on public.homework;
+create policy "homework_read" on public.homework for select using (true);
+create policy "homework_insert" on public.homework for insert to authenticated with check (author_id = auth.uid());
+create policy "homework_update" on public.homework for update to authenticated using (author_id = auth.uid() or public.is_admin());
+create policy "homework_delete" on public.homework for delete to authenticated using (author_id = auth.uid() or public.is_admin());
+
+
 -- =====================================================================
 -- [나중에 필요할 때만] 따로 실행하는 것들
 -- =====================================================================
@@ -156,7 +174,7 @@ create policy "photos_delete" on public.photos for delete to authenticated using
 
 -- 로그인한 사람만 내용을 볼 수 있게 잠그기:
 -- do $$ declare t text; begin
---   foreach t in array array['assessments','notes','events','links','posts','profiles'] loop
+--   foreach t in array array['assessments','notes','events','links','posts','homework','profiles'] loop
 --     execute format('drop policy if exists "%1$s_read" on public.%1$I', t);
 --     execute format('create policy "%1$s_read" on public.%1$I for select to authenticated using (true)', t);
 --   end loop; end $$;

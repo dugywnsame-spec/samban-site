@@ -148,10 +148,16 @@ button{cursor:pointer}
 .empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:2px}
 
 /* 홈 */
-.home{display:flex;flex-direction:column;gap:16px}
-.home-cols{display:grid;grid-template-columns:1.35fr 1fr;gap:16px;align-items:start}
+.home{display:flex;flex-direction:column;gap:14px}
+.home-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start}
+.home-top{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
 .home-col{display:flex;flex-direction:column;gap:16px;min-width:0}
-@media (max-width:900px){.home-cols{display:flex;flex-direction:column;align-items:stretch}.home-col{display:contents}
+/* 태블릿 세로(한눈에 보기): 2열 + 아래 한 줄 */
+@media (min-width:681px) and (max-width:959px){
+  .home.dense .home-cols{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home.dense .home-col.cc{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+}
+@media (max-width:680px){.home-top{display:contents}.home-cols{display:flex;flex-direction:column;align-items:stretch}.home-col{display:contents}
   .o1{order:1}.o2{order:2}.o3{order:3}.o4{order:4}.o5{order:5}.o6{order:6}.o7{order:7}}
 /* 시간표 */
 .tt-now{font-size:13px;font-weight:600;color:var(--muted)}
@@ -552,6 +558,57 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .quote .qtag{display:inline-block;font-size:11.5px;font-weight:700;background:var(--sunk);color:var(--muted);border-radius:5px;padding:1px 7px;margin-right:6px}
 .quote .qtag.ai{background:var(--board);color:var(--board-ink)}
 @media (max-width:560px){.quote .qt{font-size:18.5px}}
+/* ===== 홈 보기 방식 ===== */
+/* 넓게 보기: 2단 (기본) */
+.home.comfy .home-cols{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+.home.comfy .home-col{gap:16px}
+/* 한눈에 보기: 3단, 한 줄 날짜 칸 */
+@media (min-width:681px){
+  .home.dense,.home.dense .home-cols,.home.dense .home-col,.home.dense .home-top{gap:14px}
+  .home.dense .hero{grid-template-columns:auto minmax(0,1fr) auto;padding:12px 18px;gap:18px;align-items:center}
+  .home.dense .hero .date{font-size:30px;white-space:nowrap}
+  .home.dense .hero .date small{font-size:12.5px;margin-top:3px}
+  .home.dense .next{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:14px;align-items:center;padding:10px 14px;overflow:hidden;min-width:0}
+  .home.dense .next .lbl{display:none}
+  .home.dense .next .t{font-size:16.5px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .home.dense .next .m{margin:0;flex-wrap:nowrap;white-space:nowrap;min-width:0;overflow:hidden}
+  .home.dense .next .m .tag{display:none}
+  .home.dense .ddrow{grid-column:auto;margin:0;justify-content:flex-end;flex-wrap:nowrap}
+  .home.dense .ddrow .ddchip:nth-of-type(n+3){display:none}
+  .home.dense .ddchip .tt{max-width:9em}
+  .home.dense .ddadd{white-space:nowrap}
+  .home.dense .row{padding:8px 0}
+  .home.dense .hw{padding:7px 0}
+  .home.dense .meals.one .dishes{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
+  .home.dense .quote .qt{font-size:18px}
+  .home.dense .quote .qn{display:inline;margin:0}
+  .home.dense .quote cite{display:inline;margin:0 0 0 8px}
+  .home.dense .wd{min-height:64px}
+}
+@media (min-width:681px) and (max-width:1599px){ .home.dense .next .m>span:not(.chip):not(.dd):not(.tag){display:none} }
+@media (min-width:681px) and (max-width:1099px){ .home.dense .ttrow{gap:3px} .home.dense .ttc .sj{font-size:11.5px;letter-spacing:-.4px;text-overflow:clip} }
+@media (min-width:681px) and (max-width:999px){ .home.dense .hero{grid-template-columns:auto minmax(0,1fr)} .home.dense .ddrow{grid-column:1/-1;justify-content:flex-start} }
+/* 한눈에 보기: 열 제목 */
+.colh{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;padding:0 4px;margin-bottom:-4px}
+.colh .ico{width:15px;height:15px}
+@media (max-width:680px){.colh{display:none}.home .notice{order:-2}.home .quote{order:-1}}
+@media (min-width:681px) and (max-width:959px){ .home.dense .home-col.cc .colh{grid-column:1/-1} }
+/* 칸 제목 아이콘: 어디가 뭔지 한눈에 */
+.hi{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--sunk);color:var(--board);margin-right:8px;vertical-align:-7px;flex:none}
+.hi .ico{width:15px;height:15px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hi{color:var(--chalk)}}
+:root[data-theme="dark"] .hi{color:var(--chalk)}
+.home .panel-h h2{font-size:15.5px;display:flex;align-items:center;flex-wrap:wrap;row-gap:2px}
+.home .panel-h h2 .tt-now,.home .panel-h h2 .hwcount{margin-left:6px}
+/* 보기 전환 막대 */
+.homebar{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:-4px 0 -4px}
+.homebar .unfold{border:0;background:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:2px 4px}
+.homebar .unfold:hover{color:var(--ink)}
+.viewseg{padding:2px;border-radius:9px}
+.viewseg button{padding:4px 11px;font-size:12.5px;border-radius:7px}
+@media (max-width:680px){.viewseg{display:none}.homebar{margin:0}}
+/* 넓은 화면은 조금 더 넓게 */
+@media (min-width:1400px){.wrap,.top-in,.demo-in{max-width:1320px}}
 /* 접기 */
 .home .panel-h h2{flex:1;min-width:0}
 .foldable{cursor:pointer;user-select:none}
@@ -688,6 +745,9 @@ const SVG = {
   theme:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
   down:'<path d="M6 9l6 6 6-6"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  bowl:'<path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8.5 7.5c0-1.5 1-1.5 1-3M12 7.5c0-1.5 1-1.5 1-3M15.5 7.5c0-1.5 1-1.5 1-3"/>',
+  quote:'<path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/>',
   mega:'<path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/>',
   members:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.4 3.6 5.2"/>',
   heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
@@ -697,6 +757,7 @@ const SVG = {
   clip:'<path d="M20 11.5 12.5 19a5 5 0 0 1-7-7L13 4.5a3.3 3.3 0 0 1 4.7 4.7L10.2 16.7a1.7 1.7 0 0 1-2.4-2.4l7-7"/>'
 };
 const icon = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${SVG[n]}</svg>`;
+const hicon = n => `<span class="hi">${icon(n)}</span>`;
 
 function toast(msg){ const r=$("#toastRoot"); r.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toast.t); toast.t=setTimeout(()=>r.innerHTML="",2600); }
 
@@ -847,7 +908,7 @@ function addFolds(){
     b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"접기":"펼치기"); b.title=open?"접기":"펼치기";
     b.innerHTML=icon("down"); h.appendChild(b);
   });
-  const n=f.size, bar=document.querySelector("#main .foldall");
+  const n=f.size, bar=document.querySelector("#main .foldall-btn");
   if(bar) bar.hidden=!n;
 }
 function toggleFold(k){
@@ -918,9 +979,9 @@ function mealPanel(){
   else if(m.loading||!m.date) body=`<p class="mealmsg">급식 불러오는 중…</p>`;
   else if(m.err) body=`<p class="mealmsg">${esc(m.err)}</p>`;
   else if(!m.rows.length) body=`<p class="mealmsg">이날은 급식이 없어요.</p>`;
-  else body=`<div class="meals">${m.rows.map(r=>`<div class="mealbox"><div class="mt"><b>${esc(r.type)}</b>${r.cal?`<span>${esc(r.cal)}</span>`:""}</div><ul class="dishes">${r.dishes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`;
+  else body=`<div class="meals ${m.rows.length===1?"one":""}">${m.rows.map(r=>`<div class="mealbox"><div class="mt"><b>${esc(r.type)}</b>${r.cal?`<span>${esc(r.cal)}</span>`:""}</div><ul class="dishes">${r.dishes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`;
   return `<section class="panel o4">
-    <div class="panel-h"><h2>${isToday?"오늘의 급식":"급식"}</h2>
+    <div class="panel-h"><h2>${hicon("bowl")}${isToday?"오늘의 급식":"급식"}</h2>
       ${configured?`<div class="mealnav"><button data-act="mealMove" data-v="-1" aria-label="전날 급식">${icon("left")}</button><span class="num">${fmtD(d)}</span><button data-act="mealMove" data-v="1" aria-label="다음날 급식">${icon("right")}</button></div>`:""}</div>
     <div class="panel-b">${body}${mealOrderHTML(d)}</div></section>`;
 }
@@ -993,7 +1054,7 @@ function ttPanel(){
   const tl=todays.map(a=>{ const pn=periodNo(a)||classPeriods(date,a.subject)[0];
     return `<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">재시험</span>':""}<span class="row-m">${pn?pn+"교시":""}</span></button>`; }).join("");
   return `<section class="panel o2">
-    <div class="panel-h"><h2>${label}${st.w?` <span class="tt-now">· ${st.text}</span>`:""}</h2><button class="more" data-act="ttOpen">주간</button></div>
+    <div class="panel-h"><h2>${hicon("clock")}${label}${st.w?` <span class="tt-now">· ${st.text}</span>`:""}</h2><button class="more" data-act="ttOpen">주간</button></div>
     <div class="panel-b"><div class="ttrow" style="--n:${n}">${cells}</div>
     ${tl?`<div class="tt-today"><span class="tt-now">${st.w?"오늘":"월요일"} 수행평가</span><div class="list">${tl}</div></div>`:""}</div></section>`;
 }
@@ -1260,7 +1321,7 @@ function quoteOfDay(){
 function quotePanel(){
   const [q,src,note]=quoteOfDay();
   return `<section class="panel quote">
-    <div class="panel-h"><h2>오늘의 명언</h2></div>
+    <div class="panel-h"><h2>${hicon("quote")}오늘의 명언</h2></div>
     <div class="panel-b"><blockquote><p class="qt">${esc(q)}</p>${note?`<p class="qn">${esc(note)}</p>`:""}<cite>${src.startsWith("인터넷 명언")?`<span class="qtag">인터넷 명언</span>${esc(src.replace(/^인터넷 명언( · )?/,""))}`:src.startsWith("AI 명언")?`<span class="qtag ai">AI 명언</span>Claude가 만들었어요`:esc(src)}</cite></blockquote></div>
   </section>`;
 }
@@ -1290,7 +1351,7 @@ function hwPanel(){
   const rows=list.slice(0,6).map(h=>{ const [lbl,cls]=due(h.due_date), dn=done.has(h.id);
     return `<div class="hw ${dn?"done":""}"><button class="hwchk" data-act="hwToggle" data-id="${h.id}" aria-pressed="${dn}" aria-label="${esc(h.title)} ${dn?"완료 취소":"완료"}">${icon("check")}</button><button class="hwmain" data-act="detail" data-t="homework" data-id="${h.id}">${chip(h.subject)}<span class="row-t">${esc(h.title)}</span></button><span class="hwdue ${dn?"":cls}">${lbl}</span></div>`; }).join("");
   return `<section class="panel o3">
-    <div class="panel-h"><h2>숙제${list.length?`<span class="hwcount">남은 ${left}개</span>`:""}</h2><button class="more hwadd" data-act="compose" data-type="homework">${icon("plus")}추가</button></div>
+    <div class="panel-h"><h2>${hicon("check")}숙제${list.length?`<span class="hwcount">남은 ${left}개</span>`:""}</h2><button class="more hwadd" data-act="compose" data-type="homework">${icon("plus")}추가</button></div>
     <div class="panel-b">${rows?`<div class="hwlist">${rows}</div>${list.length>6?`<p class="row-m" style="margin-top:6px">외 ${list.length-6}개</p>`:""}`:`<p class="mealmsg">지금 등록된 숙제가 없어요. 숙제가 생기면 ‘추가’로 올려 주세요.</p>`}</div>
   </section>`;
 }
@@ -1303,8 +1364,9 @@ VIEWS.home = () => {
   const up=S.data.assessments.filter(a=>a.due_date>=t);
   const next=up[0];
   const week=[...Array(7)].map((_,i)=>addDays(t,i));
-  return `
-  <div class="home">
+  const mode=homeMode();
+  const P={
+    hero:`
     <section class="hero panel">
       <div class="date num">${d.getMonth()+1}월 ${d.getDate()}일<small>${WD[d.getDay()]}요일 · 다가오는 수행평가 ${up.length}개</small></div>
       ${next?`<button class="next" data-act="detail" data-t="assessments" data-id="${next.id}">
@@ -1313,43 +1375,63 @@ VIEWS.home = () => {
         <div class="m">${chip(next.subject)} ${ddHTML(next.due_date)} <span>${fmtD(next.due_date)}${next.period?" · "+esc(next.period):""}</span>${next.is_makeup?'<span class="tag" style="color:inherit;border-color:currentColor">결석자</span>':""}</div>
       </button>`:`<div class="next"><div class="lbl">가장 가까운 수행평가</div><div class="t">예정된 수행평가가 없어요</div></div>`}
       ${ddRow()}
-    </section>
-
-    <div class="foldall" hidden><button data-act="unfoldAll">접은 칸 모두 펼치기</button></div>
-    ${noticePanel()}
-    ${quotePanel()}
-    <div class="home-cols"><div class="home-col">
+    </section>`,
+    perf:`
     <section class="panel o1">
-      <div class="panel-h"><h2>다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
+      <div class="panel-h"><h2>${hicon("perf")}다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
       <div class="panel-b list">
-        ${up.slice(0,6).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">결석자</span>':""}<span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<div class="empty"><b>아직 등록된 수행평가가 없어요</b>로그인하고 첫 공지를 올려 보세요.</div>`}
+        ${up.slice(0,5).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">결석자</span>':""}<span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<div class="empty"><b>아직 등록된 수행평가가 없어요</b>로그인하고 첫 공지를 올려 보세요.</div>`}
+        ${up.length>5?`<button class="more" style="align-self:flex-start;padding:6px 0 0" data-act="nav" data-view="perf">외 ${up.length-5}개 더 있어요</button>`:""}
       </div>
-    </section>
-    ${hwPanel()}
-    <section class="panel o6">
-      <div class="panel-h"><h2>최근 필기</h2><button class="more" data-act="nav" data-view="notes">전체 보기</button></div>
-      <div class="panel-b list">
-        ${S.data.notes.slice(0,5).map(n=>`<button class="row" data-act="detail" data-t="notes" data-id="${n.id}">${chip(n.subject)}<span class="row-t">${esc(n.title)}</span>${n.attachments?.length?`<span class="row-m">${icon("clip")}</span>`:""}<span class="row-m">${esc(n.author_nick)}</span></button>`).join("") || `<div class="empty">아직 공유된 필기가 없어요.</div>`}
-      </div>
-    </section>
-    </div><div class="home-col">
-    ${ttPanel()}
-    ${mealPanel()}
+    </section>`,
+    week:`
     <section class="panel o5">
-      <div class="panel-h"><h2>앞으로 7일</h2><button class="more" data-act="nav" data-view="cal">캘린더</button></div>
+      <div class="panel-h"><h2>${hicon("cal")}앞으로 7일</h2><button class="more" data-act="nav" data-view="cal">캘린더</button></div>
       <div class="panel-b">
         <div class="week">${week.map(ds=>{const dd=parseD(ds);const items=itemsOn(ds);return `<button class="wd ${ds===t?"is-today":""}" data-act="calDay" data-date="${ds}" data-go="1"><span class="w">${WD[dd.getDay()]}</span><span class="n">${dd.getDate()}</span><span class="dots">${items.map(i=>i.kind==="dday"?`<i class="dot dday"></i>`:i.kind==="perf"?`<i class="dot" style="--h:${HUE[i.row.subject]??225}"></i>`:`<i class="dot ev"></i>`).join("")}</span></button>`;}).join("")}</div>
       </div>
-    </section>
+    </section>`,
+    notes:`
+    <section class="panel o6">
+      <div class="panel-h"><h2>${hicon("notes")}최근 필기</h2><button class="more" data-act="nav" data-view="notes">전체 보기</button></div>
+      <div class="panel-b list">
+        ${S.data.notes.slice(0,4).map(n=>`<button class="row" data-act="detail" data-t="notes" data-id="${n.id}">${chip(n.subject)}<span class="row-t">${esc(n.title)}</span>${n.attachments?.length?`<span class="row-m">${icon("clip")}</span>`:""}<span class="row-m">${esc(n.author_nick)}</span></button>`).join("") || `<div class="empty">아직 공유된 필기가 없어요.</div>`}
+      </div>
+    </section>`,
+    lounge:`
     <section class="panel o7">
-      <div class="panel-h"><h2>라운지 새 글</h2><button class="more" data-act="nav" data-view="lounge">라운지</button></div>
+      <div class="panel-h"><h2>${hicon("lounge")}라운지 새 글</h2><button class="more" data-act="nav" data-view="lounge">라운지</button></div>
       <div class="panel-b list">
         ${S.data.posts.slice(0,4).map(p=>`<button class="row" data-act="detail" data-t="posts" data-id="${p.id}"><span class="row-t">${esc(p.title)}</span><span class="row-m">${esc(p.author_nick)} · ${fmtTime(p.created_at)}</span></button>`).join("") || `<div class="empty">첫 글을 남겨 보세요.</div>`}
       </div>
-    </section>
-    </div></div>
+    </section>`
+  };
+  const bar=`<div class="homebar"><button class="unfold foldall-btn" data-act="unfoldAll" hidden>접은 칸 모두 펼치기</button>
+    <div class="seg viewseg" role="group" aria-label="홈 보기 방식"><button class="${mode==="comfy"?"on":""}" data-act="homeMode" data-v="comfy" aria-pressed="${mode==="comfy"}">넓게 보기</button><button class="${mode==="dense"?"on":""}" data-act="homeMode" data-v="dense" aria-pressed="${mode==="dense"}">한눈에 보기</button></div></div>`;
+  if(mode==="dense") return `
+  <div class="home dense">
+    ${P.hero}
+    ${bar}
+    <div class="home-cols">
+      <div class="home-col ca"><div class="colh">${icon("clock")}오늘</div>${ttPanel()}${mealPanel()}${quotePanel()}</div>
+      <div class="home-col cb"><div class="colh">${icon("check")}할 일</div>${P.perf}${hwPanel()}${P.week}</div>
+      <div class="home-col cc"><div class="colh">${icon("lounge")}우리 반 소식</div>${noticePanel()}${P.lounge}${P.notes}</div>
+    </div>
+  </div>`;
+  return `
+  <div class="home comfy">
+    ${P.hero}
+    ${bar}
+    ${noticePanel()}
+    ${quotePanel()}
+    <div class="home-cols">
+      <div class="home-col">${P.perf}${hwPanel()}${P.notes}</div>
+      <div class="home-col">${ttPanel()}${mealPanel()}${P.week}${P.lounge}</div>
+    </div>
   </div>`;
 };
+function homeMode(){ try{ return localStorage.getItem("class13-home")==="dense"?"dense":"comfy"; }catch(e){ return "comfy"; } }
+function setHomeMode(v){ try{ localStorage.setItem("class13-home",v); }catch(e){} render(); }
 
 /* ---------- 수행평가 ---------- */
 VIEWS.perf = () => {
@@ -1571,7 +1653,9 @@ function openTheme(){
       <div class="seg" style="align-self:flex-start">${[["system","기기 설정"],["light","라이트"],["dark","다크"]].map(([k,v])=>`<button class="${mode===k?"on":""}" data-act="setTheme" data-k="mode" data-v="${k}">${v}</button>`).join("")}</div></div>
     <div class="fld"><span class="lb">색 테마</span>
       <div class="swatches">${ACCENTS.map(([k,n,c])=>`<button class="sw-btn ${acc===k?"on":""}" data-act="setTheme" data-k="accent" data-v="${k}" aria-pressed="${acc===k}"><i style="background:${c}"></i>${n}</button>`).join("")}</div></div>
-    <p class="row-m" style="white-space:normal">테마는 지금 쓰는 기기에만 저장돼요.</p>
+    <div class="fld"><span class="lb">홈 화면 (PC · 태블릿)</span>
+      <div class="seg" style="align-self:flex-start">${[["comfy","넓게 보기"],["dense","한눈에 보기"]].map(([k,v])=>`<button class="${homeMode()===k?"on":""}" data-act="homeMode" data-v="${k}">${v}</button>`).join("")}</div></div>
+    <p class="row-m" style="white-space:normal">테마와 홈 화면 설정은 지금 쓰는 기기에만 저장돼요.</p>
   </div>`,"sm");
 }
 applyTheme();
@@ -1868,6 +1952,7 @@ document.addEventListener("click",async e=>{
     case "ttEdit": openTTEdit(); break;
     case "noticeAll": S.noticeAll=!S.noticeAll; render(); break;
     case "fold": toggleFold(el.dataset.k); break;
+    case "homeMode": setHomeMode(el.dataset.v); if($("#modalRoot").innerHTML) openTheme(); break;
     case "unfoldAll": try{ localStorage.removeItem("class13-folded"); }catch(e){} render(); break;
     case "dday": openDday(el.dataset.id); break;
     case "ttEditReset": openTTEdit(CONFIG.TIMETABLE); break;

@@ -290,6 +290,16 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .hero{background:var(--board);color:var(--board-ink);border-radius:var(--r);padding:20px;display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center;border:0}
 .hero .date{font-family:var(--f-display);font-size:44px;line-height:1}
 .hero .date small{display:block;font-family:var(--f-body);font-size:14px;opacity:.8;margin-top:6px}
+.ddrow{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:-6px}
+.ddchip{display:inline-flex;align-items:center;gap:8px;background:rgb(255 255 255 / .12);border:1px solid rgb(255 255 255 / .18);color:inherit;border-radius:999px;padding:5px 12px 5px 6px;font-size:13.5px;font-weight:600;max-width:100%}
+.ddchip:hover{background:rgb(255 255 255 / .2)}
+.ddchip .n{font-family:var(--f-mono);font-weight:600;font-size:13px;background:var(--chalk);color:var(--chalk-ink);border-radius:999px;padding:2px 9px;white-space:nowrap}
+.ddchip .n.today{background:var(--danger);color:#fff}
+.ddchip .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ddadd{background:none;border:1px dashed rgb(255 255 255 / .35);color:inherit;opacity:.85;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.ddadd:hover{opacity:1;background:rgb(255 255 255 / .08)}
+.ddadd .ico{width:14px;height:14px}
+.ddbig{font-family:var(--f-mono);font-weight:600;font-size:40px;line-height:1;color:var(--board)}
 .next{background:rgb(255 255 255 / .1);border-radius:10px;padding:14px 16px;min-width:0;border:0;color:inherit;text-align:left;width:100%}
 .next:hover{background:rgb(255 255 255 / .15)}
 .next .lbl{font-size:12px;letter-spacing:.06em;opacity:.75;font-weight:600}
@@ -311,6 +321,7 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .dots{display:flex;gap:3px;flex-wrap:wrap;justify-content:center}
 .dot{width:7px;height:7px;border-radius:50%;background:hsl(var(--h) 60% var(--chip-mid-l))}
 .dot.ev{background:var(--muted)}
+.dot.dday{background:var(--chalk);box-shadow:0 0 0 1px var(--chalk-ink)}
 
 /* 수행평가 카드 */
 .alist{display:flex;flex-direction:column;gap:10px}
@@ -383,6 +394,8 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .cell.sel{box-shadow:inset 0 0 0 2px var(--chalk)}
 .cev{font-size:11.5px;font-weight:600;padding:1px 5px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:hsl(var(--h) var(--chip-s) var(--chip-bg-l));color:hsl(var(--h) 60% var(--chip-fg-l))}
 .cev.ev{background:var(--sunk);color:var(--ink);border:1px solid var(--line)}
+.cev.dday{background:var(--chalk);color:var(--chalk-ink)}
+.sw.dday{background:var(--chalk)}
 .cev.mk{background:transparent;border:1px dashed hsl(var(--h) 45% var(--chip-mid-l))}
 .cmore{font-size:11px;color:var(--muted)}
 .cell .dots{display:none;justify-content:flex-start}
@@ -528,6 +541,32 @@ button.ttc{border:0;font:inherit;cursor:pointer;position:relative}
 .hwdue.urgent{color:var(--danger)}
 .hwcount{font-size:12.5px;font-weight:600;color:var(--muted);margin-left:6px}
 .hwadd{display:inline-flex;align-items:center;gap:4px}
+/* 오늘의 명언 */
+.quote blockquote{margin:0;position:relative;padding-left:30px}
+.quote blockquote::before{content:"“";position:absolute;left:0;top:-10px;font-family:var(--f-display);font-size:46px;line-height:1;color:var(--chalk)}
+.quote .qt{font-family:var(--f-display);font-size:21px;line-height:1.45;text-wrap:balance;word-break:keep-all;overflow-wrap:anywhere}
+.quote .qn{word-break:keep-all}
+.quote .qn{font-size:14px;color:var(--muted);margin-top:4px}
+.quote cite{display:block;font-style:normal;font-size:13px;color:var(--muted);margin-top:8px;font-weight:600}
+.quote cite::before{content:"— "}
+.quote .qtag{display:inline-block;font-size:11.5px;font-weight:700;background:var(--sunk);color:var(--muted);border-radius:5px;padding:1px 7px;margin-right:6px}
+.quote .qtag.ai{background:var(--board);color:var(--board-ink)}
+@media (max-width:560px){.quote .qt{font-size:18.5px}}
+/* 접기 */
+.home .panel-h h2{flex:1;min-width:0}
+.foldable{cursor:pointer;user-select:none}
+.fold{width:28px;height:28px;border-radius:7px;border:0;background:none;color:var(--muted);display:grid;place-items:center;padding:0;flex:none;margin-left:2px}
+.fold:hover{background:var(--sunk);color:var(--ink)}
+.fold .ico{width:17px;height:17px;transition:transform .18s}
+.folded .fold .ico{transform:rotate(-90deg)}
+.panel.folded>.panel-b{display:none}
+.panel.folded>.panel-h{padding-bottom:14px}
+.notice.folded .nb>:not(.nh){display:none}
+.notice.folded{padding-block:10px}
+.foldall{display:flex;justify-content:flex-end;margin:-6px 0 -4px}
+.foldall button{border:0;background:none;color:var(--muted);font-size:12.5px;font-weight:600;padding:2px 4px}
+.foldall button:hover{color:var(--ink)}
+@media (prefers-reduced-motion: reduce){.fold .ico{transition:none}}
 /* 공지 */
 .notice{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-left:0}
 .notice .ni{width:30px;height:30px;border-radius:8px;background:var(--chalk);color:var(--chalk-ink);display:grid;place-items:center;flex:none}
@@ -648,6 +687,7 @@ const SVG = {
   plus:'<path d="M12 5v14M5 12h14"/>', left:'<path d="M15 6l-6 6 6 6"/>', right:'<path d="M9 6l6 6-6 6"/>',
   theme:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
   check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  down:'<path d="M6 9l6 6 6-6"/>',
   mega:'<path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6M19 6.5a7.5 7.5 0 0 1 0 11"/>',
   members:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.8c2 .7 3.2 2.4 3.6 5.2"/>',
   heart:'<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
@@ -754,7 +794,7 @@ const api = Live;
 /* ======================================================================
    상태와 화면
    ====================================================================== */
-const TABLES=["assessments","notes","events","links","posts","messages","photos","homework","comments","likes","profiles","meal_order","tt_changes","class_timetable","notices"];
+const TABLES=["assessments","notes","events","links","posts","messages","photos","homework","comments","likes","profiles","meal_order","tt_changes","class_timetable","notices","ddays"];
 const LOGIN_ONLY=["messages","photos","comments","likes","profiles"];
 const SOCIAL=["assessments","notes","posts","photos"];
 const S = {
@@ -788,7 +828,32 @@ function render(){
   if(!S.ready) return;
   const v=VIEWS[S.view]||VIEWS.home;
   $("#main").innerHTML=v();
+  if(S.view==="home") addFolds();
   if(S.view==="lounge"&&S.lounge==="chat") scrollChat();
+}
+
+/* ---------- 홈 칸 접기 (각자 기기에 기억) ---------- */
+function foldSet(){ try{ return new Set(JSON.parse(localStorage.getItem("class13-folded"))||[]); }catch(e){ return new Set(); } }
+function addFolds(){
+  const f=foldSet();
+  document.querySelectorAll("#main .home section.panel:not(.hero)").forEach(sec=>{
+    const k=(sec.className.match(/\bo\d\b/)||[])[0]||(sec.classList.contains("notice")?"notice":sec.classList.contains("quote")?"quote":null); if(!k) return;
+    const h=sec.querySelector(".panel-h")||sec.querySelector(".nh"); if(!h) return;
+    const open=!f.has(k), title=h.querySelector("h2,b");
+    sec.classList.toggle("folded",!open);
+    if(title){ title.dataset.act="fold"; title.dataset.k=k; title.classList.add("foldable"); }
+    const b=document.createElement("button");
+    b.className="fold"; b.dataset.act="fold"; b.dataset.k=k;
+    b.setAttribute("aria-expanded",String(open)); b.setAttribute("aria-label",open?"접기":"펼치기"); b.title=open?"접기":"펼치기";
+    b.innerHTML=icon("down"); h.appendChild(b);
+  });
+  const n=f.size, bar=document.querySelector("#main .foldall");
+  if(bar) bar.hidden=!n;
+}
+function toggleFold(k){
+  const f=foldSet(); f.has(k)?f.delete(k):f.add(k);
+  try{ localStorage.setItem("class13-folded",JSON.stringify([...f])); }catch(e){}
+  render();
 }
 
 /* ---------- 급식 (나이스 공개 API) ---------- */
@@ -1114,6 +1179,92 @@ function toggleHw(id){
   if($("#modalRoot").innerHTML) openDetail("homework",id);
   render();
 }
+/* ---------- 오늘의 명언 (날짜마다 자동으로 바뀜, 반 전체가 같은 명언) ---------- */
+const QUOTES=[
+  ["배우고 때때로 익히면 또한 기쁘지 아니한가.", "『논어』 학이편"],
+  ["천 리 길도 한 걸음부터 시작된다.", "『도덕경』 64장"],
+  ["너 자신의 지성을 사용할 용기를 가져라.", "칸트, 「계몽이란 무엇인가에 대한 답변」"],
+  ["티끌 모아 태산", "속담", "작은 것도 꾸준히 모으면 큰 것이 된다."],
+  ["우공이산(愚公移山)", "고사성어 · 『열자』", "우직하게 한 길을 가면 산도 옮길 수 있다."],
+  ["모르는 걸 오늘 물어본 사람이 내일 아는 사람이 된다.", "AI 명언 · Claude"],
+  ["하루라도 책을 읽지 않으면 입안에 가시가 돋는다.", "안중근"],
+  ["모든 인간은 본성적으로 알기를 원한다.", "아리스토텔레스, 『형이상학』"],
+  ["아는 것을 안다 하고, 모르는 것을 모른다 하는 것이 참으로 아는 것이다.", "『논어』 위정편"],
+  ["시작이 반이다", "속담", "일단 시작하면 절반은 이룬 셈이다."],
+  ["수적천석(水滴穿石)", "고사성어", "떨어지는 물방울도 오래 떨어지면 바위를 뚫는다."],
+  ["검토되지 않은 삶은 살 가치가 없다.", "소크라테스 · 플라톤, 『소크라테스의 변론』"],
+  ["죽고자 하면 살고, 살고자 하면 죽는다.", "이순신, 『난중일기』"],
+  ["답을 외우면 시험이 끝나고, 이유를 이해하면 공부가 시작된다.", "AI 명언 · Claude"],
+  ["세 사람이 길을 가면 그 가운데 반드시 나의 스승이 있다.", "『논어』 술이편"],
+  ["가는 말이 고와야 오는 말이 곱다", "속담", "내가 먼저 좋게 말해야 상대도 좋게 대한다."],
+  ["나는 생각한다, 그러므로 나는 존재한다.", "데카르트, 『방법서설』"],
+  ["대기만성(大器晩成)", "『도덕경』 41장", "큰 그릇은 늦게 이루어진다."],
+  ["우리에게 주어진 시간이 짧은 것이 아니라, 우리가 그 시간을 많이 낭비하는 것이다.", "세네카, 『인생의 짧음에 관하여』"],
+  ["고진감래(苦盡甘來)", "고사성어", "쓴 것이 다하면 단 것이 온다."],
+  ["인간은 자연에서 가장 약한 갈대일 뿐이다. 그러나 그는 생각하는 갈대다.", "파스칼, 『팡세』"],
+  ["나는 밤새 공부해도 졸리지 않지만, 너는 자야 한다. 잠도 실력이다.", "AI 명언 · Claude", "AI가 할 수 없는 일 중 하나가 푹 자고 개운해지는 거예요."],
+  ["옛것을 익히고 새것을 알면 남의 스승이 될 만하다.", "『논어』 위정편 · 온고지신"],
+  ["늦었다고 생각할 때가 진짜 늦었다.", "인터넷 명언 · 박명수 어록", "그러니까 생각만 하지 말고 지금 바로 시작하자."],
+  ["백지장도 맞들면 낫다", "속담", "쉬운 일이라도 함께하면 더 쉽다."],
+  ["하늘의 운행은 굳건하니, 군자는 이를 본받아 스스로 쉬지 않고 힘쓴다.", "『주역』 · 자강불식"],
+  ["제비 한 마리가 봄을 만드는 것은 아니다.", "아리스토텔레스, 『니코마코스 윤리학』", "하루 잘했다고 끝이 아니라, 꾸준해야 한다."],
+  ["칠전팔기(七顚八起)", "고사성어", "일곱 번 넘어져도 여덟 번 일어난다."],
+  ["지금 잠을 자면 꿈을 꾸지만, 지금 공부하면 꿈을 이룬다.", "인터넷 명언", "‘하버드 도서관 낙서’로 퍼졌지만 실제 출처는 확인되지 않았어요."],
+  ["AI가 대신 써준 글은 점수가 될 수는 있어도 실력이 되지는 않는다.", "AI 명언 · Claude", "AI는 같이 생각하는 도구로 쓰고, 마지막 문장은 내 손으로."],
+  ["잘한 일은 잘한 말보다 낫다.", "벤저민 프랭클린"],
+  ["구슬이 서 말이라도 꿰어야 보배", "속담", "아무리 좋은 것도 다듬고 쓸모 있게 만들어야 값어치가 있다."],
+  ["시작은 일의 가장 중요한 부분이다.", "플라톤, 『국가』"],
+  ["지나침은 모자람과 같다.", "『논어』 선진편 · 과유불급"],
+  ["티끌 모아 티끌", "인터넷 명언 · 박명수 어록", "진짜 속담은 ‘티끌 모아 태산’. 꾸준히 모으면 결국 커진다."],
+  ["역지사지(易地思之)", "고사성어", "처지를 바꾸어 생각해 본다."],
+  ["미리 준비하면 걱정이 없다.", "『서경』 · 유비무환"],
+  ["틀린 문제는 실패가 아니라, 아직 안 가본 길의 지도다.", "AI 명언 · Claude"],
+  ["어떤 일은 우리에게 달려 있고, 어떤 일은 우리에게 달려 있지 않다.", "에픽테토스, 『엥케이리디온』", "바꿀 수 있는 것에 힘을 쓰자."],
+  ["우물을 파도 한 우물을 파라", "속담", "한 가지 일을 끝까지 파고들어야 성공한다."],
+  ["오늘 걷지 않으면 내일은 뛰어야 한다.", "인터넷 명언", "미루면 결국 더 힘들어진다."],
+  ["날마다 나아지고 달마다 발전한다.", "『시경』 · 일취월장"],
+  ["십시일반(十匙一飯)", "고사성어", "열 사람이 한 숟가락씩 보태면 한 사람의 밥이 된다."],
+  ["내가 더 멀리 보았다면, 그것은 거인들의 어깨 위에 서 있었기 때문이다.", "아이작 뉴턴, 로버트 훅에게 보낸 편지(1676)"],
+  ["군자는 말은 어눌하게 하고 행동은 민첩하게 하고자 한다.", "『논어』 이인편"],
+  ["완벽한 계획을 세우는 동안, 엉성한 시작은 벌써 한 걸음 앞에 가 있다.", "AI 명언 · Claude"],
+  ["일찍 일어나는 새가 피곤하다.", "인터넷 명언 · 박명수 어록", "그래도 1교시 지각은 안 돼요."],
+  ["공든 탑이 무너지랴", "속담", "정성을 다한 일은 쉽게 헛되지 않는다."],
+  ["끊고 갈고 쪼고 다듬는다.", "『시경』 · 절차탁마", "학문과 인격을 꾸준히 갈고닦는다."],
+  ["생각할수록 더 큰 감탄과 경외로 마음을 채우는 두 가지가 있다. 내 머리 위의 별이 빛나는 하늘과 내 안의 도덕 법칙이다.", "칸트, 『실천이성비판』"],
+  ["형설지공(螢雪之功)", "고사성어", "반딧불과 눈빛에 기대어 공부한 노력. 어려움 속에서도 꾸준히 공부한다."],
+  ["공부는 머리가 아니라 엉덩이로 한다.", "인터넷 명언 · 수험생 격언", "오래 앉아 있는 힘이 실력이 된다."],
+  ["남이 나를 알아주지 않음을 걱정하지 말고, 내가 남을 알지 못함을 걱정하라.", "『논어』 학이편"],
+  ["검색은 답을 주고, 생각은 질문을 준다. 멀리 가는 건 질문 쪽이다.", "AI 명언 · Claude"],
+  ["열 번 찍어 안 넘어가는 나무 없다", "속담", "꾸준히 노력하면 이루지 못할 일이 없다."],
+  ["같은 강물에 두 번 발을 담글 수는 없다.", "헤라클레이토스 · 플라톤, 『크라튈로스』에서 전함", "모든 것은 흐르고 변한다."],
+  ["가르치고 배우며 함께 자란다.", "『예기』 학기편 · 교학상장"],
+  ["고생 끝에 골병 난다.", "인터넷 명언 · 박명수 어록", "무리하지 말고 쉬어 가면서 하자."],
+  ["아는 길도 물어 가라", "속담", "잘 아는 일이라도 한 번 더 확인하면 실수가 없다."],
+  ["마부작침(磨斧作針)", "고사성어", "도끼를 갈아 바늘을 만든다. 끈기 있게 하면 결국 이룬다."],
+  ["너를 괴롭히는 것은 그 일 자체가 아니라, 그 일에 대한 너의 생각이다.", "마르쿠스 아우렐리우스, 『명상록』"],
+  ["어제의 나와 비교하자. 옆자리 친구는 다른 문제를 풀고 있다.", "AI 명언 · Claude"],
+  ["자기가 바라지 않는 것을 남에게 하지 말라.", "『논어』 위령공편"],
+  ["즐길 수 없으면 피하라.", "인터넷 명언 · 박명수 어록", "‘피할 수 없으면 즐겨라’를 뒤집은 말."],
+  ["세 살 버릇 여든까지 간다", "속담", "어릴 때 든 습관은 오래간다. 좋은 습관은 지금부터."],
+  ["높은 곳에 오르려면 반드시 낮은 곳에서부터 시작한다.", "『중용』 · 등고자비"],
+  ["나는 무엇을 아는가?", "몽테뉴, 『수상록』"],
+  ["학문은 물을 거슬러 배를 젓는 것과 같아서, 나아가지 않으면 물러난다.", "옛말 · 학여역수행주"],
+  ["참을 인(忍) 세 번이면 호구", "인터넷 명언 · 박명수 어록", "참는 것도 좋지만, 할 말은 예의 있게 하자."],
+  ["낮말은 새가 듣고 밤말은 쥐가 듣는다", "속담", "아무도 안 듣는 것 같아도 말은 늘 조심해야 한다."]
+];
+function quoteOfDay(){
+  const d=parseD(today()), base=new Date(2026,0,1);
+  const n=Math.round((d-base)/864e5);
+  return QUOTES[((n%QUOTES.length)+QUOTES.length)%QUOTES.length];
+}
+function quotePanel(){
+  const [q,src,note]=quoteOfDay();
+  return `<section class="panel quote">
+    <div class="panel-h"><h2>오늘의 명언</h2></div>
+    <div class="panel-b"><blockquote><p class="qt">${esc(q)}</p>${note?`<p class="qn">${esc(note)}</p>`:""}<cite>${src.startsWith("인터넷 명언")?`<span class="qtag">인터넷 명언</span>${esc(src.replace(/^인터넷 명언( · )?/,""))}`:src.startsWith("AI 명언")?`<span class="qtag ai">AI 명언</span>Claude가 만들었어요`:esc(src)}</cite></blockquote></div>
+  </section>`;
+}
+
 /* ---------- 공지 (회원 누구나, 정한 날짜가 지나면 숨김) ---------- */
 function activeNotices(){
   const t=today(), wk=new Date(Date.now()-7*864e5).toISOString();
@@ -1161,9 +1312,12 @@ VIEWS.home = () => {
         <div class="t">${esc(next.title)}</div>
         <div class="m">${chip(next.subject)} ${ddHTML(next.due_date)} <span>${fmtD(next.due_date)}${next.period?" · "+esc(next.period):""}</span>${next.is_makeup?'<span class="tag" style="color:inherit;border-color:currentColor">결석자</span>':""}</div>
       </button>`:`<div class="next"><div class="lbl">가장 가까운 수행평가</div><div class="t">예정된 수행평가가 없어요</div></div>`}
+      ${ddRow()}
     </section>
 
+    <div class="foldall" hidden><button data-act="unfoldAll">접은 칸 모두 펼치기</button></div>
     ${noticePanel()}
+    ${quotePanel()}
     <div class="home-cols"><div class="home-col">
     <section class="panel o1">
       <div class="panel-h"><h2>다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
@@ -1184,7 +1338,7 @@ VIEWS.home = () => {
     <section class="panel o5">
       <div class="panel-h"><h2>앞으로 7일</h2><button class="more" data-act="nav" data-view="cal">캘린더</button></div>
       <div class="panel-b">
-        <div class="week">${week.map(ds=>{const dd=parseD(ds);const items=itemsOn(ds);return `<button class="wd ${ds===t?"is-today":""}" data-act="calDay" data-date="${ds}" data-go="1"><span class="w">${WD[dd.getDay()]}</span><span class="n">${dd.getDate()}</span><span class="dots">${items.map(i=>i.kind==="perf"?`<i class="dot" style="--h:${HUE[i.row.subject]??225}"></i>`:`<i class="dot ev"></i>`).join("")}</span></button>`;}).join("")}</div>
+        <div class="week">${week.map(ds=>{const dd=parseD(ds);const items=itemsOn(ds);return `<button class="wd ${ds===t?"is-today":""}" data-act="calDay" data-date="${ds}" data-go="1"><span class="w">${WD[dd.getDay()]}</span><span class="n">${dd.getDate()}</span><span class="dots">${items.map(i=>i.kind==="dday"?`<i class="dot dday"></i>`:i.kind==="perf"?`<i class="dot" style="--h:${HUE[i.row.subject]??225}"></i>`:`<i class="dot ev"></i>`).join("")}</span></button>`;}).join("")}</div>
       </div>
     </section>
     <section class="panel o7">
@@ -1287,8 +1441,28 @@ function noteCards(){
 
 /* ---------- 캘린더 ---------- */
 function itemsOn(ds){
-  return [...S.data.assessments.filter(a=>a.due_date===ds).map(r=>({kind:"perf",row:r})),
+  return [...S.data.ddays.filter(x=>x.date===ds).map(r=>({kind:"dday",row:r})),
+          ...S.data.assessments.filter(a=>a.due_date===ds).map(r=>({kind:"perf",row:r})),
           ...S.data.events.filter(e=>e.date===ds).map(r=>({kind:"event",row:r}))];
+}
+/* D-day: 지나간 건 숨기고 가까운 순 */
+const ddLbl=d=>{ const n=dday(d); return n===0?"D-DAY":"D-"+n; };
+function upcomingDdays(){ const t=today(); return S.data.ddays.filter(x=>x.date>=t).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0); }
+function ddRow(){
+  const list=upcomingDdays().slice(0,4);
+  const chips=list.map(x=>`<button class="ddchip" data-act="dday" data-id="${x.id}"><span class="n ${dday(x.date)===0?"today":""}">${ddLbl(x.date)}</span><span class="tt">${esc(x.title)}</span></button>`).join("");
+  const add=me()?`<button class="ddadd" data-act="compose" data-type="ddays">${icon("plus")}D-day</button>`:"";
+  return chips||add?`<div class="ddrow">${chips}${add}</div>`:"";
+}
+function openDday(id){
+  const x=S.data.ddays.find(r=>r.id===id); if(!x) return;
+  openModal(`<div class="modal-h"><div style="flex:1;min-width:0"><h2>${esc(x.title)}</h2></div><button class="close" data-act="close" aria-label="닫기">×</button></div>
+  <div class="modal-b">
+    <div style="display:flex;align-items:baseline;gap:12px"><span class="ddbig">${ddLbl(x.date)}</span><span class="row-m num">${fmtD(x.date)}</span></div>
+    ${x.memo?`<div class="prose">${linkify(x.memo)}</div>`:""}
+    <p class="row-m">${esc(x.author_nick)}님이 등록</p>
+    <div class="actions" style="justify-content:flex-start"><button class="btn ghost sm" data-act="calDay" data-date="${x.date}" data-go="1">캘린더에서 보기</button>${canDel(x)?`<button class="btn danger sm" data-act="del" data-t="ddays" data-id="${x.id}">삭제</button>`:""}</div>
+  </div>`,"sm");
 }
 VIEWS.cal = () => {
   const {y,m,sel}=S.cal; const first=new Date(y,m,1); const start=new Date(y,m,1-first.getDay());
@@ -1310,17 +1484,19 @@ VIEWS.cal = () => {
         ${cells.map(d=>{const ds=ymd(d);const its=itemsOn(ds);
           return `<button class="cell ${d.getMonth()!==m?"out":""} ${ds===t?"is-today":""} ${ds===sel?"sel":""}" data-act="calDay" data-date="${ds}" aria-label="${ds} 일정 ${its.length}개">
             <span class="cn">${d.getDate()}</span>
-            ${its.slice(0,3).map(i=>i.kind==="perf"?`<span class="cev ${i.row.is_makeup?"mk":""}" style="--h:${HUE[i.row.subject]??225}">${esc(i.row.subject)} ${esc(i.row.title.replace("[예시] ",""))}</span>`:`<span class="cev ev">${esc(i.row.title.replace("[예시] ",""))}</span>`).join("")}
+            ${its.slice(0,3).map(i=>i.kind==="dday"?`<span class="cev dday">${esc(i.row.title)}</span>`:i.kind==="perf"?`<span class="cev ${i.row.is_makeup?"mk":""}" style="--h:${HUE[i.row.subject]??225}">${esc(i.row.subject)} ${esc(i.row.title.replace("[예시] ",""))}</span>`:`<span class="cev ev">${esc(i.row.title.replace("[예시] ",""))}</span>`).join("")}
             ${its.length>3?`<span class="cmore">+${its.length-3}개</span>`:""}
-            <span class="dots">${its.map(i=>i.kind==="perf"?`<i class="dot" style="--h:${HUE[i.row.subject]??225}"></i>`:`<i class="dot ev"></i>`).join("")}</span>
+            <span class="dots">${its.map(i=>i.kind==="dday"?`<i class="dot dday"></i>`:i.kind==="perf"?`<i class="dot" style="--h:${HUE[i.row.subject]??225}"></i>`:`<i class="dot ev"></i>`).join("")}</span>
           </button>`;}).join("")}
       </div>
-      <div class="legend"><span><i class="sw"></i>수행평가</span><span><i class="sw mk"></i>결석자 시험</span><span><i class="sw ev"></i>학급 일정</span></div>
+      <div class="legend"><span><i class="sw"></i>수행평가</span><span><i class="sw mk"></i>결석자 시험</span><span><i class="sw ev"></i>학급 일정</span><span><i class="sw dday"></i>D-day</span></div>
     </section>
     <section class="panel">
       <div class="panel-h"><h2>${fmtD(sel)} ${ddHTML(sel)}</h2></div>
       <div class="panel-b day-list">
-        ${items.map(i=>i.kind==="perf"
+        ${items.map(i=>i.kind==="dday"
+          ?`<button class="ditem" data-act="dday" data-id="${i.row.id}"><span class="dd ${dday(i.row.date)===0?"today":"soon"}">${ddLbl(i.row.date).replace("D--","D+")}</span><span class="dt"><b>${esc(i.row.title)}</b><span>D-day · ${esc(i.row.author_nick)}</span></span></button>`
+          :i.kind==="perf"
           ?`<button class="ditem" data-act="detail" data-t="assessments" data-id="${i.row.id}">${chip(i.row.subject)}<span class="dt"><b>${esc(i.row.title)}</b><span>${i.row.is_makeup?"결석자 시험 · ":""}${esc(i.row.period||"수행평가")}</span></span></button>`
           :`<div class="ditem"><span class="dt"><b>${esc(i.row.title)}</b><span>${esc(i.row.memo||"학급 일정")} · ${esc(i.row.author_nick)}</span></span>${canDel(i.row)?`<button class="btn ghost sm" data-act="del" data-t="events" data-id="${i.row.id}">삭제</button>`:""}</div>`).join("")
           || `<div class="empty">이날은 일정이 없어요.</div>`}
@@ -1493,6 +1669,10 @@ const FORMS = {
     ["title","어떤 사진인가요","text",{req:1,ph:"예) 2학기 체육대회 단체 사진"}],
     ["taken_date","찍은 날","date",{def:"today"}],
     ["attachments","사진","files",{img:1}]]},
+  ddays:{table:"ddays",title:"D-day 추가",fields:[
+    ["title","무슨 날인가요","text",{req:1,ph:"예) 2학기 기말고사",attrs:'maxlength="30"'}],
+    ["date","날짜","date",{req:1}],
+    ["memo","메모","text",{ph:"예) 시험 범위는 3단원까지 (선택)"}]]},
   notices:{table:"notices",title:"공지 쓰기",fields:[
     ["body","공지 내용","area",{req:1,ph:"예) 내일 체육복 챙기기 / 5교시 과학실로 이동",attrs:'maxlength="200"'}],
     ["until","언제까지 보일까요","date",{def:"+3",hint:"이 날짜가 지나면 홈에서 자동으로 사라져요. 비우면 일주일 동안 보여요."}]]},
@@ -1674,7 +1854,7 @@ document.addEventListener("click",async e=>{
     case "mealMove": { let d=addDays(S.meal.date||today(),+el.dataset.v); const w=parseD(d).getDay(); if(w===0||w===6) d=addDays(d,(+el.dataset.v>0)?(w===6?2:1):(w===0?-2:-1)); loadMeal(d); break; }
     case "calMove": { let m=S.cal.m+ +el.dataset.v, y=S.cal.y; if(m<0){m=11;y--;} if(m>11){m=0;y++;} S.cal.m=m; S.cal.y=y; render(); break; }
     case "calToday": { const d=new Date(); S.cal={y:d.getFullYear(),m:d.getMonth(),sel:today()}; render(); break; }
-    case "calDay": { const d=parseD(el.dataset.date); S.cal={y:d.getFullYear(),m:d.getMonth(),sel:el.dataset.date}; if(el.dataset.go) go("cal"); else render(); break; }
+    case "calDay": { const d=parseD(el.dataset.date); S.cal={y:d.getFullYear(),m:d.getMonth(),sel:el.dataset.date}; if($("#modalRoot").innerHTML){ $("#modalRoot").innerHTML=""; document.body.style.overflow=""; S.cur=null; S.calTab="month"; } if(el.dataset.go) go("cal"); else render(); break; }
     case "lightbox": openGallery(el); break;
     case "lbmove": moveLB(+el.dataset.v); break;
     case "like": e.stopPropagation(); toggleLike(el.dataset.t,el.dataset.id); break;
@@ -1687,6 +1867,9 @@ document.addEventListener("click",async e=>{
     case "ttCell": openTTCell(el.dataset.date,+el.dataset.i); break;
     case "ttEdit": openTTEdit(); break;
     case "noticeAll": S.noticeAll=!S.noticeAll; render(); break;
+    case "fold": toggleFold(el.dataset.k); break;
+    case "unfoldAll": try{ localStorage.removeItem("class13-folded"); }catch(e){} render(); break;
+    case "dday": openDday(el.dataset.id); break;
     case "ttEditReset": openTTEdit(CONFIG.TIMETABLE); break;
     case "ttOpen": S.calTab="tt"; S.ttWeek=0; go("cal"); break;
     case "zoom": zoomAt(LB.z.s*(+el.dataset.v>0?1.5:1/1.5)); break;

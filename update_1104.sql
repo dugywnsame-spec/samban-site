@@ -122,3 +122,20 @@ drop policy if exists "notices_delete" on public.notices;
 create policy "notices_read" on public.notices for select using (true);
 create policy "notices_insert" on public.notices for insert to authenticated with check (author_id = auth.uid());
 create policy "notices_delete" on public.notices for delete to authenticated using (author_id = auth.uid() or public.is_admin());
+
+-- 8) D-day (회원 누구나, 지난 날짜는 홈에서 자동으로 숨김)
+create table if not exists public.ddays (
+  id uuid primary key default gen_random_uuid(),
+  title text not null check (char_length(title) between 1 and 30),
+  date date not null,
+  memo text,
+  author_id uuid not null default auth.uid() references public.profiles(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+alter table public.ddays enable row level security;
+drop policy if exists "ddays_read" on public.ddays;
+drop policy if exists "ddays_insert" on public.ddays;
+drop policy if exists "ddays_delete" on public.ddays;
+create policy "ddays_read" on public.ddays for select using (true);
+create policy "ddays_insert" on public.ddays for insert to authenticated with check (author_id = auth.uid());
+create policy "ddays_delete" on public.ddays for delete to authenticated using (author_id = auth.uid() or public.is_admin());

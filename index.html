@@ -1033,6 +1033,17 @@ function classPeriods(date,subject){
   const list=dayList(date);
   return list.map((x,i)=>TT_FULL[x]===subject?i+1:0).filter(Boolean);
 }
+/* 수행평가가 끝난 시각: 적어둔 교시 → 없으면 그날 그 과목 마지막 수업 → 그것도 없으면 그날 밤 */
+function perfEnd(a){
+  const p=periodNo(a)||classPeriods(a.due_date,a.subject).slice(-1)[0];
+  const pr=p&&CONFIG.PERIODS[p-1];
+  const d=parseD(a.due_date);
+  if(pr){ const [h,m]=pr[1].split(":").map(Number); d.setHours(h,m,0,0); }
+  else d.setHours(23,59,59,999);
+  return d;
+}
+const perfDone=a=>new Date()>=perfEnd(a);
+const ddA=a=>(a.due_date===today()&&perfDone(a))?`<span class="dd">끝남</span>`:ddHTML(a.due_date);
 const mkTag=as=>as.length?`<span class="mk ${as.every(a=>a.is_makeup)?"re":""}">${as.every(a=>a.is_makeup)?"재시험":"수행"}</span>`:"";
 function ttStatus(){
   const now=new Date(), w=ttDay(now); if(!w) return {w:null};
@@ -1101,7 +1112,7 @@ function ttTable(){
   }).join("");
   const wk=S.data.assessments.filter(a=>dates.includes(a.due_date));
   const wl=wk.map(a=>{ const w=parseD(a.due_date).getDay(); const pn=periodNo(a)||classPeriods(a.due_date,a.subject)[0];
-    return `<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">재시험</span>':""}<span class="row-m num">${dn[w]} ${pn?pn+"교시":""}</span></button>`; }).join("");
+    return `<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddA(a)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">재시험</span>':""}<span class="row-m num">${dn[w]} ${pn?pn+"교시":""}</span></button>`; }).join("");
   const r=s=>{ const d=parseD(s); return `${d.getMonth()+1}.${d.getDate()}`; };
   return `<section class="panel"><div class="panel-h"><h2>주간 시간표</h2>
       <div class="ttweek">${off?`<button class="btn ghost sm" data-act="ttWeek" data-v="0">이번 주</button>`:""}<button class="iconbtn" data-act="ttWeek" data-v="${off-1}" aria-label="지난주">${icon("left")}</button><span>${r(dates[0])} ~ ${r(dates[4])}</span><button class="iconbtn" data-act="ttWeek" data-v="${off+1}" aria-label="다음 주">${icon("right")}</button></div></div>
@@ -1379,7 +1390,7 @@ const VIEWS = {};
 VIEWS.members = membersView;
 VIEWS.home = () => {
   const t=today(), d=new Date();
-  const up=S.data.assessments.filter(a=>a.due_date>=t);
+  const up=S.data.assessments.filter(a=>a.due_date>=t&&!perfDone(a));
   const next=up[0];
   const week=[...Array(7)].map((_,i)=>addDays(t,i));
   const mode=homeMode();
@@ -1390,7 +1401,7 @@ VIEWS.home = () => {
       ${next?`<button class="next" data-act="detail" data-t="assessments" data-id="${next.id}">
         <div class="lbl">가장 가까운 수행평가</div>
         <div class="t">${esc(next.title)}</div>
-        <div class="m">${chip(next.subject)} ${ddHTML(next.due_date)} <span>${fmtD(next.due_date)}${next.period?" · "+esc(next.period):""}</span>${next.is_makeup?'<span class="tag" style="color:inherit;border-color:currentColor">결석자</span>':""}</div>
+        <div class="m">${chip(next.subject)} ${ddA(next)} <span>${fmtD(next.due_date)}${next.period?" · "+esc(next.period):""}</span>${next.is_makeup?'<span class="tag" style="color:inherit;border-color:currentColor">결석자</span>':""}</div>
       </button>`:`<div class="next"><div class="lbl">가장 가까운 수행평가</div><div class="t">예정된 수행평가가 없어요</div></div>`}
       ${ddRow()}
     </section>`,
@@ -1398,7 +1409,7 @@ VIEWS.home = () => {
     <section class="panel o1">
       <div class="panel-h"><h2>${hicon("perf")}다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
       <div class="panel-b list">
-        ${up.slice(0,5).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">결석자</span>':""}<span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<div class="empty"><b>아직 등록된 수행평가가 없어요</b>로그인하고 첫 공지를 올려 보세요.</div>`}
+        ${up.slice(0,5).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddA(a)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span>${a.is_makeup?'<span class="tag">결석자</span>':""}<span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<div class="empty"><b>아직 등록된 수행평가가 없어요</b>로그인하고 첫 공지를 올려 보세요.</div>`}
         ${up.length>5?`<button class="more" style="align-self:flex-start;padding:6px 0 0" data-act="nav" data-view="perf">외 ${up.length-5}개 더 있어요</button>`:""}
       </div>
     </section>`,
@@ -1430,7 +1441,7 @@ VIEWS.home = () => {
     const perf3=`<section class="panel o1">
       <div class="panel-h"><h2>${hicon("perf")}다가오는 수행평가</h2><button class="more" data-act="nav" data-view="perf">전체 보기</button></div>
       <div class="panel-b list">
-        ${up.slice(0,3).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddHTML(a.due_date)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span><span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<p class="mealmsg">예정된 수행평가가 없어요.</p>`}
+        ${up.slice(0,3).map(a=>`<button class="row" data-act="detail" data-t="assessments" data-id="${a.id}">${ddA(a)}${chip(a.subject)}<span class="row-t">${esc(a.title)}</span><span class="row-m num">${fmtD(a.due_date)}</span></button>`).join("") || `<p class="mealmsg">예정된 수행평가가 없어요.</p>`}
         ${up.length>3?`<button class="more" style="align-self:flex-start;padding:6px 0 0" data-act="nav" data-view="perf">외 ${up.length-3}개 더 보기</button>`:""}
       </div></section>`;
     return `
@@ -1462,7 +1473,7 @@ function setHomeMode(v){ try{ localStorage.setItem("class13-home",v); }catch(e){
 /* ---------- 수행평가 ---------- */
 VIEWS.perf = () => {
   const t=today(); const up=S.perfTab==="up";
-  let rows=S.data.assessments.filter(a=>up?a.due_date>=t:a.due_date<t);
+  let rows=S.data.assessments.filter(a=>up?(a.due_date>=t&&!perfDone(a)):(a.due_date<t||perfDone(a)));
   if(S.perfSub!=="전체") rows=rows.filter(a=>a.subject===S.perfSub);
   if(!up) rows=[...rows].reverse();
   const used=[...new Set(S.data.assessments.map(a=>a.subject))];
@@ -1475,7 +1486,7 @@ VIEWS.perf = () => {
     return head+`<button class="acard panel ${a.is_makeup?"makeup":""} ${up?"":"past"}" style="--h:${HUE[a.subject]??225}" data-act="detail" data-t="assessments" data-id="${a.id}">
       <div class="adate"><span class="md">${d.getMonth()+1}.${d.getDate()}</span><span class="wk">${WD[d.getDay()]}요일</span></div>
       <div class="abody">
-        <div class="tline">${chip(a.subject)}${ddHTML(a.due_date)}${a.is_makeup?'<span class="tag">결석자 시험</span>':""}</div>
+        <div class="tline">${chip(a.subject)}${ddA(a)}${a.is_makeup?'<span class="tag">결석자 시험</span>':""}</div>
         <h3>${esc(a.title)}</h3>
         ${a.description?`<p class="desc">${esc(a.description)}</p>`:""}
         ${cs}
@@ -2158,7 +2169,7 @@ window.addEventListener("hashchange",()=>{ const v=location.hash.slice(1); if(v&
     return;
   }
   S.ready=true; render();
-  setInterval(()=>{ if(S.view==="home"&&!$("#modalRoot").innerHTML&&!document.activeElement?.matches("input,textarea")) render(); },60000);
+  setInterval(()=>{ if((S.view==="home"||S.view==="perf")&&!$("#modalRoot").innerHTML&&!document.activeElement?.matches("input,textarea")) render(); },60000);
   { let d=today(); const w=parseD(d).getDay(); loadMeal(d); }
 })();
 </script>

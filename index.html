@@ -731,6 +731,13 @@ button.me:hover{background:rgb(255 255 255 / .1)}
 .schk{display:inline-flex;gap:6px;align-items:center;font-size:13.5px;font-weight:600;color:var(--muted)}
 .schk input{width:17px;height:17px;accent-color:var(--board)}
 .sedit{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--chalk);color:var(--chalk-ink);border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.sedit-t{flex:1;min-width:200px}
+.sedit .btn.ghost{background:rgb(255 255 255 / .55);border-color:rgb(0 0 0 / .12);color:var(--chalk-ink)}
+.sedit .btn.danger{background:var(--danger);color:#fff;border-color:var(--danger)}
+.stray{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:-4px 0 12px;padding:10px 12px;border:1.5px dashed var(--line);border-radius:12px;background:var(--surface)}
+.stray-h{font-size:13px;color:var(--muted);margin-right:4px}
+.stu{border:1.5px solid var(--line);background:var(--sunk);color:var(--ink);border-radius:999px;padding:4px 11px;font-size:13.5px;font-weight:600;cursor:pointer}
+.stu.on{background:var(--board);border-color:var(--board);color:var(--board-ink)}
 .sedit .ico{width:18px;height:18px}
 .sedit span{flex:1;min-width:0}
 .sedit .btn{background:var(--chalk-ink);color:var(--chalk)}
@@ -2251,8 +2258,12 @@ document.addEventListener("click",async e=>{
     case "revealAll": revealAll(); break;
     case "revealEnd": S.seat.revealing=null; render(); break;
     case "seatClick": seatClick(el.dataset.id); break;
-    case "seatSwap": S.seat.edit=S.seat.edit==="swap"?null:"swap"; S.seat.pick=null; render(); break;
-    case "seatSwapDone": S.seat.edit=null; S.seat.pick=null; render(); break;
+    case "seatSwap": S.seat.edit=S.seat.edit==="swap"?null:"swap"; S.seat.pick=null; S.seat.pickStu=null; S.seat.clearArm=false; render(); break;
+    case "seatSwapDone": S.seat.edit=null; S.seat.pick=null; S.seat.pickStu=null; S.seat.clearArm=false; render(); break;
+    case "seatClearAll": if(!S.seat.clearArm){ S.seat.clearArm=true; render(); setTimeout(()=>{ if(S.seat.clearArm){ S.seat.clearArm=false; render(); } },4000); break; }
+      S.seat.layout=seatLayoutNow(); S.seat.assign={}; S.seat.pick=null; S.seat.pickStu=null; S.seat.clearArm=false; render(); toast("자리를 모두 비웠어요. 이름을 눌러 한 명씩 앉혀 보세요."); break;
+    case "seatPickStu": { const n=+el.dataset.no; S.seat.pickStu=S.seat.pickStu===n?null:n; S.seat.pick=null; render(); break; }
+    case "seatUnseat": { const a={...seatAssignNow()}; delete a[S.seat.pick]; S.seat.assign=a; S.seat.layout=seatLayoutNow(); S.seat.pick=null; render(); break; }
     case "seatHwpx": exportSeatHwpx(); break;
     case "seatSettings": openSeatSettings(); break;
     case "seatFixedEdit": { const f=$("#seatSetForm"); if(f){ const cfg=seatCfg(); cfg.fixedStudents=[...f.querySelectorAll("input[name=fs]:checked")].map(i=>+i.value); cfg.exclude=[...f.querySelectorAll("input[name=ex]:checked")].map(i=>+i.value); } } closeModal(); S.seat.edit="fixed"; S.seat.layout=seatLayoutNow(); go("members"); break;
@@ -2600,6 +2611,18 @@ function seatGridHTML(L,assign,cfg){
     <div class="seatgrid" style="grid-template-columns:${tpl}">${rows.map(r=>r.map(c=>c?seatCellHTML(c,assign,cfg,L):`<span class="aisle" aria-hidden="true"></span>`).join("")).join("")}</div>
     ${top?"":seatBoardHTML(false)}</div>`;
 }
+/* 자리 바꾸기: 두 자리 맞바꾸기 · 모두 지우기 · 남은 학생 직접 앉히기 */
+function seatSwapBar(assign,cfg){
+  const st=S.seat, seated=new Set(Object.values(assign)), left=seatStudents(cfg).filter(n=>!seated.has(n));
+  const msg=st.pickStu?`<b>${esc(rosterName(st.pickStu))}</b>을(를) 앉힐 자리를 눌러 주세요.`
+    : st.pick?`<b>${esc(seatLabel(st.pick))}</b>와 바꿀 자리를 눌러 주세요.${assign[st.pick]?"":" (빈자리로 옮길 수도 있어요)"}`
+    : left.length?"아래 이름을 누르고 자리를 누르면 앉혀져요. 앉은 두 자리를 누르면 서로 바뀌어요.":"바꿀 두 자리를 차례로 눌러 주세요.";
+  return `<div class="sedit">${icon("check")}<span class="sedit-t">${msg}</span>
+    ${st.pick&&assign[st.pick]?`<button class="btn ghost sm" data-act="seatUnseat">이 자리 비우기</button>`:""}
+    ${Object.keys(assign).length?`<button class="btn ghost sm ${st.clearArm?"danger":""}" data-act="seatClearAll">${st.clearArm?"한 번 더 누르면 모두 지워져요":"모두 지우기"}</button>`:""}
+    <button class="btn sm" data-act="seatSwapDone">완료</button></div>
+  ${left.length?`<div class="stray"><span class="stray-h">아직 안 앉은 학생 <b>${left.length}명</b></span>${left.map(n=>`<button class="stu ${st.pickStu===n?"on":""}" data-act="seatPickStu" data-no="${n}">${esc(rosterName(n))}</button>`).join("")}</div>`:""}`;
+}
 function seatView(){
   if(!me()) return `<div class="empty"><b>자리 배치는 로그인한 친구만 볼 수 있어요</b><button class="btn" style="margin-top:10px" data-act="login">로그인</button></div>`;
   if(!S.data.class_roster.length) return `<div class="empty"><b>아직 반 명단이 없어요</b>관리자가 Supabase에서 <code>update_1106.sql</code>을 실행하면 35명 명단이 들어가요.</div>`;
@@ -2610,7 +2633,7 @@ function seatView(){
     : st.assign ? `<span class="sbadge">연습 뽑기 · 아직 확정 전</span>${st.repeatPairs!=null&&L==="pair"&&cfg.avoidPrev?`<span class="sbadge soft">지난 짝과 겹침 ${st.repeatPairs}쌍</span>`:""}`
     : savedHere ? `<span class="sbadge ok">${sv.savedAt?fmtD(sv.savedAt.slice(0,10))+" ":""}확정된 자리</span>` : `<span class="sbadge soft">아직 뽑지 않았어요</span>`;
   const edit=st.edit==="fixed"?`<div class="sedit">${icon("check")}<span>고정석으로 쓸 자리를 눌러 주세요. 지금 <b>${fixedN}자리</b> · 고정석 학생 <b>${(cfg.fixedStudents||[]).length}명</b></span><button class="btn sm" data-act="seatFixedDone">완료</button></div>`
-    : st.edit==="swap"?`<div class="sedit">${icon("check")}<span>${st.pick?`<b>${esc(seatLabel(st.pick))}</b>와 바꿀 자리를 눌러 주세요.`:"바꿀 두 자리를 차례로 눌러 주세요."}</span><button class="btn sm" data-act="seatSwapDone">완료</button></div>`:"";
+    : st.edit==="swap"?seatSwapBar(assign,cfg):"";
   return `
   <div class="seattools">
     <div class="srow">
@@ -2620,7 +2643,7 @@ function seatView(){
     </div>
     <div class="srow">
       <button class="btn" data-act="seatShuffle" ${st.revealing?"disabled":""}>${icon("shuffle")}자리 뽑기</button>
-      <button class="btn ghost" data-act="seatSwap" ${Object.keys(assign).length?"":"disabled"}>자리 바꾸기</button>
+      <button class="btn ghost ${st.edit==="swap"?"on":""}" data-act="seatSwap" ${st.revealing?"disabled":""}>자리 바꾸기</button>
       <button class="btn ghost" data-act="seatHwpx" ${Object.keys(assign).length?"":"disabled"}>${icon("download")}한글로 저장</button>
       ${isSeatAdmin()?`<button class="btn ghost" data-act="seatSave" ${st.assign&&!st.revealing?"":"disabled"}>이 배치로 확정</button><button class="btn ghost" data-act="seatSettings">고정석 · 명단 설정</button>`:""}
       ${L==="pair"?`<label class="schk"><input type="checkbox" id="seatAvoid" ${cfg.avoidPrev?"checked":""} ${isSeatAdmin()?"":"disabled"}> 지난 짝과 안 겹치게</label>`:""}
@@ -2722,6 +2745,8 @@ async function seatClick(id){
   const st=S.seat, L=seatLayoutNow();
   if(st.edit==="fixed"){ const cfg=seatCfg(); cfg.fixedSeats=cfg.fixedSeats||{}; const arr=new Set(cfg.fixedSeats[L]||[]); arr.has(id)?arr.delete(id):arr.add(id); cfg.fixedSeats[L]=[...arr]; render(); return; }
   if(st.edit==="swap"){
+    st.clearArm=false;
+    if(st.pickStu){ const a={...seatAssignNow()}; a[id]=st.pickStu; st.assign=a; st.layout=L; st.flash=id; st.pickStu=null; render(); setTimeout(()=>{ st.flash=null; },600); return; }  /* 원래 앉아 있던 친구는 '안 앉은 학생'으로 돌아가요 */
     if(!st.pick){ st.pick=id; render(); return; }
     if(st.pick===id){ st.pick=null; render(); return; }
     const a={...seatAssignNow()}; const x=a[st.pick], y=a[id];

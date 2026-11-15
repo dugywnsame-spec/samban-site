@@ -1167,7 +1167,7 @@ const SVG = {
 const icon = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${SVG[n]}</svg>`;
 const hicon = n => `<span class="hi">${icon(n)}</span>`;
 
-function toast(msg){ const r=$("#toastRoot"); r.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toast.t); toast.t=setTimeout(()=>r.innerHTML="",2600); }
+function toast(msg){ const r=$("#toastRoot"); r.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`; clearTimeout(toast.t); toast.t=setTimeout(()=>r.innerHTML="",Math.max(2600,String(msg).length*90)); }
 
 /* ======================================================================
    데이터 계층: 서버 (Supabase)
@@ -1286,8 +1286,25 @@ S.seat=S.seat||{};
 const me = () => api.user;
 const canDel = r => me() && (r.author_id===me().id || me().role==="admin");
 
-async function reload(t){ try{ S.data[t]=await api.list(t); }catch(e){ console.error(e); toast("불러오지 못한 내용이 있어요. 새로고침해 주세요."); } }
-async function loadAll(){ await Promise.all(TABLES.map(t=> (LOGIN_ONLY.includes(t)&&!me()) ? (S.data[t]=[]) : reload(t))); }
+/* 표가 아직 없으면(업데이트 SQL을 안 돌렸으면) 어떤 파일을 실행해야 하는지 알려줘요 */
+const TABLE_SQL={class_roster:"update_1106.sql",seat_plan:"update_1106.sql",meal_ratings:"update_1106.sql",meal_photos:"update_1106.sql",songs:"update_1106.sql",birthdays:"update_1106.sql",
+  exam_ranges:"update_1113.sql",fest_items:"update_1113.sql",polls:"update_1113.sql",poll_options:"update_1113.sql",poll_votes:"update_1113.sql",
+  notices:"update_1104.sql",ddays:"update_1104.sql",tt_changes:"update_1104.sql",class_timetable:"update_1104.sql",meal_order:"update_1103.sql"};
+const LOAD_FAIL=new Map();
+async function reload(t,quiet){
+  try{ S.data[t]=await api.list(t); LOAD_FAIL.delete(t); }
+  catch(e){ console.warn(`[${t}] 불러오지 못함:`,e?.message||e); LOAD_FAIL.set(t,e); }   /* 화면에는 알림을 띄우지 않아요. 그 칸만 비어 보여요 */
+}
+function loadFailMsg(){
+  const ts=[...LOAD_FAIL.keys()], miss=ts.filter(t=>{ const e=LOAD_FAIL.get(t), m=String(e?.message||e?.code||""); return /does not exist|could not find|schema cache|PGRST20|42P01/i.test(m); });
+  if(me()?.role==="admin"&&miss.length){ const files=[...new Set(miss.map(t=>TABLE_SQL[t]||"schema.sql"))]; return `서버에 표가 없어요: ${miss.join(", ")} → Supabase SQL Editor에서 ${files.join(", ")} 실행`; }
+  if(me()?.role==="admin"&&ts.length) return `불러오지 못한 표: ${ts.join(", ")} (F12 콘솔에 자세한 이유가 있어요)`;
+  return "불러오지 못한 내용이 있어요. 새로고침해 주세요.";
+}
+async function loadAll(){
+  await Promise.all(TABLES.map(t=> (LOGIN_ONLY.includes(t)&&!me()) ? (S.data[t]=[]) : reload(t,true)));
+  if(LOAD_FAIL.size) console.warn("불러오지 못한 표:",loadFailMsg());
+}
 
 function renderChrome(){
   $("#siteName").textContent=CONFIG.SITE_NAME;
